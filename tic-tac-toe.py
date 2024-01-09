@@ -8,6 +8,7 @@ class Board:
         self.turn = 'x'
         self.moveCount = 0
         self.gameOver = False
+        self.winner = '-1'
 
     def printBoard(self):
         counter = 0
@@ -83,12 +84,16 @@ class Board:
                 return False
 
     def makeMove(self, piece):
-        if piece.lower() != self.turn:
+        if self.gameOver:
+            return
+        elif self.moveCount == 9:
+            self.winner = 'draw'
+            self.gameOver = True
+            return
+        elif piece.lower() != self.turn:
             print('Not your turn, ' + str(piece))
             return
-        elif self.gameOver:
-            return
-
+        
         while True:
             try:
                 index = int(input('Enter the number 1-9 that would like to place your square\n > '))
@@ -107,7 +112,10 @@ class Board:
         self.board[index][0] = piece.upper()
         self.moveCount += 1
         self.gameOver = self.checkForWin(index)
-        print(self.gameOver)
+        if self.gameOver:
+            self.winner = self.turn
+            return
+
         if self.turn == 'x':
             self.turn = 'o'
         else:
@@ -132,17 +140,37 @@ class Player:
     def claimLoss(self):
         self.losses += 1
 
-    def claimDraws(self):
+    def claimDraw(self):
         self.draws += 1
         
-over = False
-obj = Board()
-playerX = Player('x')
-playerO = Player('o')
-print(playerX.getPiece())
-while not obj.gameOver:
+
+class AI:
+    def __init__(self):
+        pass
+
+
+if __name__ == "__main__":
+    over = False
+    obj = Board()
+    playerX = Player('x')
+    playerO = Player('o')
+    print(playerX.getPiece())
+    while not obj.gameOver:
+        obj.printBoard()
+        obj.makeMove(playerX.piece)
+        obj.printBoard()
+        obj.makeMove(playerO.piece)
+    
+    print('Final Board:')
     obj.printBoard()
-    obj.makeMove(playerX.piece)
-    obj.printBoard()
-    obj.makeMove(playerO.piece)
-    print('base loop obj.gameOver: ' + str(obj.gameOver) )
+    print('WINNER IS ' + obj.winner)
+
+    if obj.winner == 'x':
+        playerX.claimWin()
+        playerO.claimLoss()
+    elif obj.winner == 'o':
+        playerO.claimWin()
+        playerX.claimLoss()
+    elif obj.winner == 'draw':
+        playerX.claimDraw()
+        playerO.claimDraw()
