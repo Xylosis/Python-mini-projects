@@ -174,6 +174,7 @@ class AI:
         self.history = []
         self.winningDictionary = {}
         self.winDictIndex = 0
+        self.losingList = []
 
     def updatePossibleMoves(self):
         self.updateTempBoard()
@@ -189,8 +190,10 @@ class AI:
         eval = 0
         self.displayTempBoard()
         print(self.winningDictionary)
+        print(self.losingList)
         print(self.tempBoardObj.turn)
         if self.tempBoardObj.winner != '-1':
+            print('there was A WINNER')
             if self.tempBoardObj.winner == self.piece:
                 eval += 1
             elif self.tempBoardObj.winner == 'draw':
@@ -209,12 +212,13 @@ class AI:
                 tempMoveList.remove(move)
                 self.history.append(move)
                 eval += self.evaluate(tempMoveList, depth= depth-1)
+                print(eval)
                 self.tempBoardObj.unmakeMove(move)
                 if(eval > 0): 
                     self.winningDictionary[self.winDictIndex] = self.history[:]
                     self.winDictIndex += 1
                 elif (eval < 0):
-                    pass
+                    self.losingList.append(self.history[:])
                 self.history.pop()
                 #print(eval)
 
@@ -226,12 +230,14 @@ class AI:
                 tempMoveList.remove(move)
                 self.history.append(move)
                 eval += self.evaluate(tempMoveList, depth=depth-1)
+                print(eval)
+                print(self.tempBoardObj.winner)
                 self.tempBoardObj.unmakeMove(move)
                 if(eval > 0): 
                     self.winningDictionary[self.winDictIndex] = self.history
                     self.winDictIndex += 1
                 elif (eval < 0):
-                    pass
+                    self.losingList.append(self.history[:])
                 self.history.pop()
                 
             
